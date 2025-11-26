@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="assets/css/table.css">
+
+
+<style>
+  @font-face {
+  font-family: 'DroidKufi-Regular';
+  src: url(assets/DroidKufi-Regular.ttf);
+}
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+@page {
+  bleed: 1cm;
+  size: A4 portrait;
+      size:  auto ! important;   /* auto is the initial value */
+      margin-left: 0mm ! important;  /* this affects the margin in the printer settings */
+      margin-bottom: 0mm ! important;
+      margin-top: 0mm ! important;
+ 
+}
+
+@media print {
+  .page {
+    margin: 0 ! important;
+    border: initial ! important;
+    border-radius: initial ! important;
+    width: initial ! important;
+    min-height: initial ! important;
+    box-shadow: initial ! important;
+    background: initial ! important;
+    page-break-after: always ! important;
+  }
+  .table thead.thead th{
+   background: #EFC106 ! important;
+   border-top: none ! important;
+
+  }
+  .sp{
+  padding-right: 1rem ! important;
+  }
+  h5{
+  font-size: 14px ! important;
+}
+
+
+h2{
+  font-size: 20px ! important;
+}
+
+.tax_box{
+  border: 1px solid #b1b1b1 ! important;
+}
+.letter-title2{
+border: 1px solid #b1b1b1 ! important;
+}
+div.letter-title2 .inn{
+  border-bottom: 2px solid #b1b1b1 ! important;
+}
+.sum_box{
+  border: 1px solid #b1b1b1 ! important;
+    border-right: 0 ! important;
+}
+}
+
+.arabic_font{
+  font-family: 'DroidKufi-Regular' ! important;
+  font-size: 14px ! important;
+}
+
+.arabic1_font{
+  font-family: 'DroidKufi-Regular' ! important;
+  font-size: 16px ! important;
+}
+
+body {
+   /*background: #eee;*/
+   font-family: 'Open Sans', sans-serif;
+   -webkit-print-color-adjust: exact !important;
+}
+html[dir="rtl"] body{
+    /*background: #eee;*/
+    font-family: 'regular';
+}
+h2{
+  font-size: 20px ! important;
+  line-height: 1.6 ! important;
+  letter-spacing: 0.9px ! important;
+  font-weight: 600 ! important;
+}
+
+h6{
+   font-size: 14px ! important;
+  line-height: 1.6 ! important;
+  letter-spacing: 0.9px ! important;
+  font-weight: 600 ! important;
+}
+
+h5{
+  font-size: 16px ! important;
+  line-height: 1.6 ! important;
+  letter-spacing: 0.9px ! important;
+  font-weight: 600 ! important;
+}
+.image{
+  max-width: 300px ! important;
+}
+div.container {
+   border-radius: 15px ! important;
+   background: white ! important;
+   /*box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2) ! important;*/
+}
+
+div.invoice-letter{
+   width: auto ! important;
+   position: relative ! important;
+  /* min-height: 150px;*/
+   /* background-color: #fff ! important; */
+   /*margin-right: -48px;
+   margin-left: -48px;*/
+   /*box-shadow: 0 4px 3px rgba(0,0,0,0.4);*/
+}
+
+div.letter-title{
+   margin-top: 5px ! important;
+   /*height: 130px;*/
+   /*border-right: 2px solid #eee;*/
+}
+div.letter-title1{
+   margin-top: 5px ! important;
+  /* height: 130px;*/
+   /*border-right: 2px solid #eee;*/
+   text-align: right ! important;
+}
+
+div.letter-title1 .inn{
+  border-bottom: 2px solid #000 ! important;
+  margin-top: 5px ! important;
+}
+
+div.letter-title1 .inn2{
+  border-bottom: 2px solid #000 ! important;
+  margin-top: 0 !important;
+  background-color: #E0E0E0 ! important;
+}
+
+div.letter-title1 .inn2 .lis{
+  background-color: #fff ! important;
+  text-align: center ! important;
+  margin-bottom: 0 ! important;
+}
+/*
+div.letter-title1 .inn h5 span{
+  text-align: center;
+  padding-left: 80px;
+  padding-right: 30px;
+}*/
+
+div.bank{
+  border: 2px solid #000 ! important;
+  padding-left: 5px ! important;
+  padding-right: 0 ! important;
+}
+
+div.letter-content{
+   margin-top: 10px ! important;
+}
+
+.table thead.thead th{
+   background: #aeafb1 ! important;
+   border-top: none ! important;
+   border-right:1px solid #000;
+    font-size: 16px ! important;
+}
+.table>tbody>tr>td{
+    font-size: 16px ! important;
+}
+
+.table thead th{
+  border-bottom: none ! important;
+}
+.tablee thead.thead th{
+   background:none ! important;
+   border-top: none ! important;
+    font-size: 16px ! important;
+}
+.tablee>tbody>tr>td{
+    font-size: 16px ! important;
+}
+
+.tablee thead th{
+  border-bottom: none ! important;
+}
+
+/*table.invoice thead tr:first-child th:first-child{
+    border-top-left-radius: 25px;
+}
+
+table.invoice thead tr:first-child th:last-child{
+   border-top-right-radius: 25px;
+}*/
+
+/*tr.last-row{
+   background-color: rgba(4, 97, 123, 0.2);
+
+}
+
+tr.last-row th{
+   border-bottom-left-radius: 25px;
+   width: 30px;
+}
+
+tr.last-row td{
+   border-bottom-right-radius: 25px;
+}
+
+div.row div.to{
+   height: 260px;
+   padding-right: 25px;
+   border-right: 2px solid rgba(4, 97, 123, 0.2);
+}*/
+.table{
+  margin-bottom: 5px ! important;
+}
+.table th,tr{
+  text-align: center;
+}
+.sp{
+  padding-right: 1rem ! important;
+  }
+  .table th{
+    padding: 5px 0 5px 0 ! important;
+  }
+  .tablee{
+  margin-bottom: 5px ! important;
+}
+.tablee th,tr{
+  text-align: center;
+  border:1px solid #000;
+}
+
+  .tablee th{
+    padding: 5px 0 5px 0 ! important;
+  }
+
+.tax_box{
+  border: 1px solid #b1b1b1 ! important;
+  padding: 10px 0 5px 0;
+  margin: 10px 0;
+}
+.letter-title2{
+  margin-top: 20px !important;
+text-align: right !important;
+border: 1px solid #b1b1b1 ! important;
+}
+div.letter-title2 .inn{
+  border-bottom: 2px solid #b1b1b1 ! important;
+  margin-top: 5px ! important;
+}
+.sum_box{
+  border: 1px solid #b1b1b1 ! important;
+  border-right: 0 ! important;
+   text-align: center;
+  padding: 40px 0;
+}
+li{
+  list-style: none;
+  font-size: 16px ! important;
+    line-height: 1.6 ! important;
+    letter-spacing: 0.9px ! important;
+    font-weight: 600 ! important;
+}
+@media only screen and (max-width: 1199px) and (min-width: 320px){
+  .logo{
+    margin-left:-70px !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- /.main-menu -->
+
+<div id="wrapper">
+<div class="main-content">
+
+
+<div class="container">
+  <div class="row" style="margin-top: 20px;">
+  <div class="col-md-5">
+    
+    <p>p.o.box :20535</p>
+    <p>Tel:17608282/17608266</p>
+    <p>Fax:17600623/17601930</p>
+   
+  </div>
+  <div class="col-md-2">
+  <img src="assets/logo.png" class="logo" style="margin-left:-50px;margin-top:-20px;"/>
+  </div>
+  <div class="col-md-5" style="text-align:right">
+       <p class="arabic_font">ص.ب :٢٠٥٣٥</p>
+    <p class="arabic_font">هاتف:١٧٦٠٨٢٨٢/١٧٦٠٨٢٦٦</p>
+    <p class="arabic_font">فاكس:١٧٦٠٠٦٢٣/١٧٦٠١٩٣٠</p>
+</div>
+</div>
+<div class="row" style="margin-top:-50px;margin-left:70px;">
+  
+  <div class="col-md-12">
+    <p class="text-center">Reprint Tax Invoice Cash</p>
+  <p class="text-center">VAT Number : 200000067500002</p>
+  </div>
+  </div>
+ 
+<br><br>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-5" style="margin-top:0;">
+ 
+        <p>Invoice ID : INV.AJO.022226</p>
+           <p>Order No : 1</p>
+              <p>Sonic Invoice No : 1</p>
+        <P>Customer Name: ONLINE CASH</P>
+        <P>Address: BILDF 702, ROAD 101 ,BLOCK 1012</P>
+        <P>Customer: TRN:</P>
+        <P>Salesperson Name. ALL JAAFAR OBEID</P>
+  
+</div>
+
+<div class="col-md-5" style="position:relative;left:23%;">
+
+    <p>Date: 2023-09-27 : 12:47:00</p>
+    <P>Customer Code:61937</P>
+    <P>Address: BILDF 702, ROAD 101 ,BLOCK 1012</P>
+    <P>Location: DEPCO</P>
+    <P>Route Code: B</P>
+ 
+  </div>
+</div>
+</div>
+
+
+<!-- <div class="row table"> -->
+<table class="table table-hover"style="padding:0px; margin-left: 1.5rem" >
+<thead class="thead" >
+<tr>
+<th scope="col">Code</th>
+<th scope="col">DESCRIPTION</th>
+<th scope="col">Crates</th>
+<th scope="col">KGs</th>
+<th scope="col">Qty</th>
+<th scope="col">Kgs Price</th>
+<th scope="col">Gross</th>
+<th scope="col">Disc</th>
+<th scope="col">VAT%</th>
+<th scope="col">VAT</th>
+<th scope="col">Amount</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<th scope="row">CWBGF1000</th>
+<td>WHOLE CHICKEN 1000<BR>Gms/Bag - FRESH</td>
+<td>1</td>
+<td>10</td>
+<td>10 </td>
+<td>1.550</td>
+<td>15.500</td>
+<td>0</td>
+<td>0</td>
+<td>0.000</td>
+<td>15.500</td>
+</tr>
+<tr>
+<th scope="row">CWBGF1000</th>
+<td>WHOLE CHICKEN 1000<BR>Gms/Bag - FRESH</td>
+<td>1</td>
+<td>10</td>
+<td>10 </td>
+<td>1.550</td>
+<td>15.500</td>
+<td>0</td>
+<td>0</td>
+<td>0.000</td>
+<td>15.500</td>
+</tr>
+</tbody>
+</table>
+<!-- </div> -->
+<div class="container invoice-letter" style="padding-left:25px;">
+  <div class="row tax_box">
+    <div class="col-6"><h5>Total  Crates :</h5>
+      <h5>Total   KGs : 10</h5>
+      <h5>Total   Qty : 10</h5>
+      <h5>Accmltd Crates : 1</h5>
+    </div>
+    <div class="col-6">
+      <ul>
+      <li style="text-align:left;">Total Discounts <span  style="text-align:left;margin-left:30px;" >= 0.000 <b style="margin-left:12px;">BHD</b></span></li>
+      <li style="text-align:left;">Amount Excl. Vat  <span  style="text-align:left;margin-left:15px;"> = 15.5 <b style="margin-left:22px;">BHD</b></span></li>
+      <li style="text-align:left;">Delivery Charges  <span  style="text-align:left;margin-left:15px;">= 0.364 <b style="margin-left:14px;">BHD</b></span></li>
+      <li style="text-align:left">VAT<span  style="text-align:left;margin-left:128px;"> = 0.036 <b style="margin-left:14px;">BHD</b></span></li>
+      <li style="text-align:left">Total<span  style="text-align:left;margin-left:118px;"> = 15.900 <b style="margin-left:6px;">BHD</b></span></li>
+      <li style="text-align:left">Balance Due <span  style="text-align:left;margin-left:50px;"> = 0.000 <b style="margin-left:16px;">BHD</b></span></li>
+    </ul>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <table class="table" style="padding:0px; margin-left: 1.5rem;">
+    <thead class="thead">
+    <tr>
+    <h5 scope="col">CASH / CHEQUE DETAILS</h5>
+    <th scope="col">Cheque Date</th>
+    <th scope="col">TYPE</th>
+    <th scope="col">CHEQUE NUM </th>
+    <th scope="col">AMOUNT</th>
+    <th scope="col">BANK NAME</th>
+
+    </tr>
+    </thead>
+    
+    <tbody>
+    <tr>
+    <th scope="row"></th>
+    <td>Debit<BR>Card</td>
+    <td></td>
+    <td>15.900</td>
+    <td></td>
+ 
+    </tr>
+    
+    </tbody>
+    </table>
+</div>
+</div>
+
+
+<div class="container invoice-letter pt-3">
+<div class="row">
+<div class="col-md-12 py-2 letter-title">
+
+<h5 class="text-center mt-3">DELMON POULTRY COMPANY B.S.C</h5>
+<p class="text-center mt-3">CR:10700</p>
+<p class="text-center mt-3">TRN:200000067500002</p>
+
+<p class="text-center mt-3">Address:Building:701, Road/Street: 101. Town: AL-HAMALAH,Block: 1012. Country:Bahrain</p>
+<p class="text-center mt-3">Note: By signing this invoice you agree all products were received in good condition.</p>
+<p class="text-center mt-3">This is System Generated Report. No signature required.</p>
+<h6 class="text-center mt-3">THANK YOU</h6>
+<h6 class="text-center mt-3">ORIGINAL</h6>
+<h6 class="text-center mt-3">NOTE:ANY MANUAL CORRECTIONS ON WHITE COPY AND OTHER COPIES ARE NOT ACCEPTED</h6>
+
+</div>
+</div>
+<div class="row">
+  <div class="col-md-2"></div>
+<div class="col-md-3">
+  <p>Sales Rep:</p>
+  <p>--------------</p>
+</div>
+<div class="col-md-3">
+  <p>Supervisor Signature:</p>
+  <p>--------------------</p>
+</div>
+<div class="col-md-4">
+  <p>Customer  Signature:</p>
+  <p>---------------------</p>
+</div>
+</div>
+<!-- /.row small-spacing -->   
+</div>
+</div>
+<!-- /.main-content -->
+</div>
+<script src="assets/scripts/jquery.min.js"></script>
+
+
+
+
+
+
+</body>
+
+</html>
