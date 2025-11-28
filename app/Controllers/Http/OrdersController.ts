@@ -426,20 +426,21 @@ export default class OrdersController {
         let loyaltyPointDiscount = language == 'en' ? enLoyaltyPointDiscount : arLoyaltyPointDiscount
 
         if (UpdatePost.orderStatus == 'USERREJECTED' || UpdatePost.orderStatus == 'CANCELLED') {
+            if (orderDetail.isLoyaltyPointApply == true) {
+                let loyaltyPoint = (orderDetail.netAmount / 100) * 10
 
-            let loyaltyPoint = (orderDetail.netAmount / 100) * 10
+                let LoyaltyPointsPayload = {
+                    userId: orderDetail.userId,
+                    orderId: params.id,
+                    usedLoyaltyPoint: loyaltyPoint,
+                    type: type,
+                    loyaltyType: "CREDIT"
+                }
 
-            let LoyaltyPointsPayload = {
-                userId: orderDetail.userId,
-                orderId: params.id,
-                usedLoyaltyPoint: loyaltyPoint,
-                type: type,
-                loyaltyType: "CREDIT"
+                await UserRepo.loyaltyPointUpdate(orderDetail.userId, loyaltyPoint, language);
+
+                await LoyaltyPointsRepo.create(LoyaltyPointsPayload, language);
             }
-
-            await UserRepo.loyaltyPointUpdate(orderDetail.userId, loyaltyPoint, language);
-
-            await LoyaltyPointsRepo.create(LoyaltyPointsPayload, language);
         }
 
         if (UpdatePost.orderStatus == 'COMPLETED') {
