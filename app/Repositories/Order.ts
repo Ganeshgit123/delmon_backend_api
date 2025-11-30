@@ -164,7 +164,12 @@ export default class OrderRepo {
             .innerJoin('delivery_boys', 'orders.delivery_boy_id', 'delivery_boys.id')
             .if(type, (query) => query.where('orders.type', type))
             .if(startDate && endDate, (query) => {
-                query.whereBetween('delivery_order_date', [`${startDate}`, `${endDate}`])
+                query.whereRaw(
+                    `STR_TO_DATE(delivery_order_date, '%d/%m/%Y')
+                     BETWEEN STR_TO_DATE(?, '%d/%m/%Y')
+                     AND STR_TO_DATE(?, '%d/%m/%Y')`,
+                    [startDate, endDate]
+                );
             })
             // .if(startDate, (query) =>
             //     query.where('delivery_order_date', startDate))
