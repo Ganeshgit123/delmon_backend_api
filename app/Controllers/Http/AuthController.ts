@@ -1,11 +1,11 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Validators from "../../Validators";
-import { AuthRepo, UserRepo } from "../../Repositories";
+import { AuthRepo, UserRepo, SettingsRepo } from "../../Repositories";
 import JWT from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'
 const JWT_SECRET_KEY = Env.get('JWT_SECRET_KEY')
 import { SUCCESS } from "../../Data/language";
-import { UserDomain } from "../../Domain";
+import { UserDomain, SettingsDomain } from "../../Domain";
 import Exceptions from '../../Exceptions';
 import { FAILURE } from "../../Data/language";
 import axios, { AxiosRequestConfig } from 'axios'
@@ -292,6 +292,23 @@ export default class AuthController {
 
         }
 
+        let setting = SettingsDomain.createFromArrOfObject(
+            await SettingsRepo.adminGet(1)
+        )
+        let maxCartonDiscountPerDayUser
+        let maxCartonDiscountPerDayEmployee
+
+        if (setting.length != 0) {
+            await setting.map((data) => {
+                if (data.key == 'max_carton_discount_per_day') {
+                    maxCartonDiscountPerDayUser = data.enValue
+                }
+                if (data.key == 'max_carton_discount_per_day_employee') {
+                    maxCartonDiscountPerDayEmployee = data.enValue
+                }
+            })
+        }
+
         const data = {
             mobileNumber: mobileNumber,
             countryCode: countryCode,
@@ -302,7 +319,9 @@ export default class AuthController {
             isApprove: userType == 'USER' ? 1 : 0,
             employeeNumber: employeeNumber ? employeeNumber : '',
             crNumber: crNumber ? crNumber : '',
-            otp: mobileNumber == 1234567890 ? 1234 : otp
+            otp: mobileNumber == 1234567890 ? 1234 : otp,
+            maxCartonDiscountPerDayUser: maxCartonDiscountPerDayUser ? maxCartonDiscountPerDayUser : 0,
+            maxCartonDiscountPerDay: maxCartonDiscountPerDayEmployee ? maxCartonDiscountPerDayEmployee : 0,
             // otp: 1234
         }
         const maybeUser = await AuthRepo.isEntryExist(mobileNumber);
@@ -397,6 +416,23 @@ export default class AuthController {
 
         const language = request.header('language') || 'en'
 
+        let setting = SettingsDomain.createFromArrOfObject(
+            await SettingsRepo.adminGet(1)
+        )
+        let maxCartonDiscountPerDayUser
+        let maxCartonDiscountPerDayEmployee
+
+        if (setting.length != 0) {
+            await setting.map((data) => {
+                if (data.key == 'max_carton_discount_per_day') {
+                    maxCartonDiscountPerDayUser = data.enValue
+                }
+                if (data.key == 'max_carton_discount_per_day_employee') {
+                    maxCartonDiscountPerDayEmployee = data.enValue
+                }
+            })
+        }
+
         const data = {
             mobileNumber: mobileNumber,
             countryCode: countryCode,
@@ -407,6 +443,8 @@ export default class AuthController {
             isApprove: 1,
             employeeNumber: employeeNumber ? employeeNumber : '',
             crNumber: crNumber ? crNumber : '',
+            maxCartonDiscountPerDayUser: maxCartonDiscountPerDayUser ? maxCartonDiscountPerDayUser : 0,
+            maxCartonDiscountPerDay: maxCartonDiscountPerDayEmployee ? maxCartonDiscountPerDayEmployee : 0,
         }
         const maybeUser = await AuthRepo.isEntryExist(mobileNumber);
 
