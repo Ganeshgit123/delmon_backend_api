@@ -19,8 +19,6 @@ import { Puppeteer } from 'App/Services'
 var path = require("path");
 import fs from 'fs';
 import { format } from 'date-fns'
-import axios, { AxiosRequestConfig } from 'axios'
-
 import { sendEmail, getOrderConfirmationEmailBody, getOrderCancelledEmailBody, getOrderDeliveredEmailBody } from 'App/utils/EmailHelper'
 
 
@@ -439,6 +437,32 @@ export default class OrdersController {
 
                 await LoyaltyPointsRepo.create(LoyaltyPointsPayload, language);
             }
+
+            if (orderDetail.paymentTypeId == "WALLET") {
+                let userList = UserDomain.createFromArrOfObject(
+                    await UserRepo.getUserById([orderDetail.userId])
+                )
+                // ensure values are numbers (handle strings/null) and add them safely
+                const currentWallet = Number(userList[0].walletAmount) || 0;
+                const refundAmount = Number(orderDetail.netAmount) || 0;
+                // round to 2 decimal places to avoid floating point precision issues
+                const wallet = Number((currentWallet + refundAmount).toFixed(2));
+
+                let walletDetails = {
+                    walletAmount: wallet
+                }
+
+                await UserRepo.walletUpdate(orderDetail.userId, walletDetails, language);
+
+                let walletUpdateDate = {
+                    userId: orderDetail.userId,
+                    orderId: params.id,
+                    amount: orderDetail.netAmount,
+                    paymentType: "REFUND",
+                    type: "ADD",
+                }
+                await WalletRepo.create(walletUpdateDate, language);
+            }
         }
 
         if (UpdatePost.orderStatus == 'COMPLETED') {
@@ -458,6 +482,7 @@ export default class OrdersController {
             }
         }
 
+        // update stock count upon order cancellation
         if (UpdatePost.orderStatus == 'USERREJECTED' || UpdatePost.orderStatus == 'CANCELLED') {
 
             let result = UserDomain.createFromArrOfObject(
@@ -593,6 +618,7 @@ export default class OrdersController {
         //     await UserRepo.update(updateResult.userId, userUpdate, language);
         // }
 
+        // carton discount calculation on order cancellation
         if (UpdatePost.orderStatus == 'CANCELLED' || UpdatePost.orderStatus == 'USERREJECTED') {
 
             let userUpdate = {
