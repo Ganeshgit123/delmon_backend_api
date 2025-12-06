@@ -61,6 +61,18 @@ export default class UserRepo {
         return result
     }
 
+    static async getUserByUserType(userType) {
+        // only fetch active users
+        const query = User.query().where('active', 1)
+        if (Array.isArray(userType)) {
+            query.whereIn('user_type', userType)
+        } else {
+            query.where('user_type', userType)
+        }
+        const result = await query
+        return result
+    }
+
     static async getUserDetails(ids, language) {
         const result = await User.query().whereIn('id', ids)
         if (result.length == 0) throw Exceptions.notFound(FAILURE.USER_CONFLICT[language])
