@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Validators from "../../Validators";
-import { LoyaltyPointsDomain, UserDomain, SettingsDomain } from "../../Domain";
-import { LoyaltyPointsRepo, UserRepo, SettingsRepo } from "../../Repositories";
+import { LoyaltyPointsDomain, UserDomain } from "../../Domain";
+import { LoyaltyPointsRepo, UserRepo } from "../../Repositories";
 import { SUCCESS } from "../../Data/language";
 import AuthController from 'App/Controllers/Http/AuthController'
 

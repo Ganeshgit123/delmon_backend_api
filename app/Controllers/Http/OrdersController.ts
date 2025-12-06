@@ -413,17 +413,15 @@ export default class OrdersController {
             await SettingsRepo.adminGet(1)
         )
         let enLoyaltyPointDiscount
-        let arLoyaltyPointDiscount
 
         if (setting.length != 0) {
             await setting.map((data) => {
                 if (data.key == 'loyalty_point_per_order') {
                     enLoyaltyPointDiscount = data.enValue
-                    arLoyaltyPointDiscount = data.arValue
                 }
             })
         }
-        let loyaltyPointDiscount = language == 'en' ? enLoyaltyPointDiscount : arLoyaltyPointDiscount
+        let loyaltyPointDiscount = enLoyaltyPointDiscount
 
         if (UpdatePost.orderStatus == 'USERREJECTED' || UpdatePost.orderStatus == 'CANCELLED') {
             if (orderDetail.isLoyaltyPointApply == true) {
@@ -444,26 +442,20 @@ export default class OrdersController {
         }
 
         if (UpdatePost.orderStatus == 'COMPLETED') {
-
-            let loyaltyPoint
+            // Only calculate and persist loyalty points when discount is enabled (non-zero)
             if (loyaltyPointDiscount != 0) {
-                loyaltyPoint = (orderDetail.netAmount / 100) * loyaltyPointDiscount
+                const loyaltyPoint = (orderDetail.netAmount / 100) * loyaltyPointDiscount
+                const LoyaltyPointsPayload = {
+                    userId: orderDetail.userId,
+                    orderId: params.id,
+                    usedLoyaltyPoint: loyaltyPoint,
+                    type: type,
+                    loyaltyType: "CREDIT"
+                }
 
-            } else {
-                loyaltyPoint = 0
+                await UserRepo.loyaltyPointUpdate(orderDetail.userId, loyaltyPoint, language);
+                await LoyaltyPointsRepo.create(LoyaltyPointsPayload, language);
             }
-
-            let LoyaltyPointsPayload = {
-                userId: orderDetail.userId,
-                orderId: params.id,
-                usedLoyaltyPoint: loyaltyPoint,
-                type: type,
-                loyaltyType: "CREDIT"
-            }
-
-            await UserRepo.loyaltyPointUpdate(orderDetail.userId, loyaltyPoint, language);
-
-            await LoyaltyPointsRepo.create(LoyaltyPointsPayload, language);
         }
 
         if (UpdatePost.orderStatus == 'USERREJECTED' || UpdatePost.orderStatus == 'CANCELLED') {
