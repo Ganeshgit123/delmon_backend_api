@@ -124,7 +124,7 @@ Route.group(() => {
 
   Route.group(() => {
     Route.get('/get', 'FavoritesController.get')
-    Route.post('/', 'FavoritesController.favorites').middleware('auth') 
+    Route.post('/', 'FavoritesController.favorites').middleware('auth')
   }).prefix('/favorites')
 
   Route.group(() => {
@@ -169,6 +169,10 @@ Route.group(() => {
   Route.group(() => {
     Route.post('/', 'NotificationsController.smsNotification')
   }).prefix('/sms')
+
+  Route.group(() => {
+    Route.post('/', 'NotificationsController.sendEmailPushNotification')
+  }).prefix('/emailNotification')
 
   Route.group(() => {
     Route.get('/cron', 'SettingsController.cronUpdate')

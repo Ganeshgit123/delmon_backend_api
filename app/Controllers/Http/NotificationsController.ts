@@ -9,6 +9,7 @@ import JWT from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'
 const JWT_SECRET_KEY = Env.get('JWT_SECRET_KEY')
 import axios, { AxiosRequestConfig } from 'axios'
+import { sendEmail } from 'App/utils/EmailHelper'
 
 
 export default class NotificationsController {
@@ -304,6 +305,95 @@ export default class NotificationsController {
                 message: 'Failed to send SMS notifications',
                 error: err?.message || String(err)
             }
+        }
+    }
+
+    public async sendEmailPushNotification({ request }: HttpContextContract) {
+
+        const payload = request.all()
+        const language = request.header('language') || 'es'
+
+        if (!payload || !payload.recipientType) {
+            return { success: false, message: 'recipientType is required' }
+        }
+
+        const normalizeUsers = (usersAny: any) => {
+            if (!usersAny) return []
+            if (Array.isArray(usersAny)) return usersAny
+            return [usersAny]
+        }
+
+        try {
+            let users: any[] = []
+
+            if (payload.recipientType === 'single') {
+                if (payload.userId) {
+                    const userData = await UserRepo.getUserById(payload.userId)
+                    users = normalizeUsers(userData)
+                } else {
+                    const allRaw = await UserRepo.getAll('', '', '', '', '', '', '', '')
+                    users = UserDomain.createFromArrOfObject(allRaw) || []
+                }
+            } else if (payload.recipientType === 'group') {
+                if (!payload.groupId) {
+                    return { success: false, message: 'groupId is required for group recipientType' }
+                }
+                const groupUsers = await UserRepo.getUserByUserType(payload.groupId)
+                users = normalizeUsers(groupUsers)
+            } else {
+                return { success: false, message: `Unsupported recipientType: ${payload.recipientType}` }
+            }
+
+            if (!users || users.length === 0) {
+                return { success: false, message: 'No users found for the given recipient criteria' }
+            }
+
+            const subject = payload.subject || 'Delmon Notification'
+            const messageText = payload.body || ''
+
+            const results = await Promise.all(users.map(async (user) => {
+                try {
+                    const email = user.email || user.emailAddress || ''
+                    if (!email) {
+                        return { id: user.id, success: false, error: 'missing email' }
+                    }
+
+                    const customerName = user.userName || user.firstName || ''
+                    const html = `
+                        <div style="font-family: Arial, sans-serif;">
+                            <p>Dear ${customerName}</p>
+                            <p>${messageText}</p>
+                            <p>Best regards,<br/>Delmon Poultry Company</p>
+                        </div>
+                    `
+
+                    await sendEmail(email, subject, html)
+
+                    // persist notification record similar to email flows
+                    await NotificationRepo.create({
+                        productId: 0,
+                        userId: user.id,
+                        type: 'ADMIN_EMAIL',
+                        message: messageText
+                    }, language)
+
+                    return { id: user.id, success: true }
+                } catch (err) {
+                    return { id: user.id, success: false, error: err?.message || String(err) }
+                }
+            }))
+
+            const attempted = results.length
+            const succeeded = results.filter(r => r.success).length
+            const failed = results.filter(r => !r.success).map(r => ({ id: r.id, error: r.error }))
+
+            return {
+                success: true,
+                message: 'Email send completed.',
+                summary: { attempted, succeeded, failedCount: failed.length, failed }
+            }
+        } catch (err) {
+            return { success: false, message: 'Failed to send email notifications', error: err?.message || String(err) }
         }
     }
 }
