@@ -88,6 +88,7 @@ export default class LoyaltyPointsController {
             return {
                 error: true,
                 massage: `You have No loyaltyPoint.`,
+                data: 0,
             };
         }
     }
