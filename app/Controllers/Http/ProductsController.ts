@@ -21,9 +21,9 @@ export default class ProductsController {
 
         for (let i = 0; i < favoritesLen; i++) {
             let item = favorites[i]
-            console.log("item,"+item)
+            console.log("item," + item)
             for (let j = 0; j < postsLen; j++) {
-                            console.log("item2,"+item)
+                console.log("item2," + item)
 
                 if (item.productId === post[j].id) {
                     post[j].isFavorites = 1
@@ -35,7 +35,7 @@ export default class ProductsController {
         return post
     }
 
-    public add = async (productList: any, language: any ) => {
+    public add = async (productList: any, language: any) => {
 
         if (productList.length != 0) {
             productList.map(async (el) => {
@@ -77,10 +77,10 @@ export default class ProductsController {
         let userTypeCat = 0
         let employeeType = 0
 
-        if(userType1 == "EMPLOYEE") {
-          employeeType = 1
-        } else if(userType1 == "USER"){
-          userTypeCat = 1
+        if (userType1 == "EMPLOYEE") {
+            employeeType = 1
+        } else if (userType1 == "USER") {
+            userTypeCat = 1
         }
 
         let priceListNameId = await UserTypesRepo.getUserType(typeOfUser)
@@ -94,7 +94,7 @@ export default class ProductsController {
 
         // console.log(type, categoryId, searchValue)
         let productList = ProductDomain.createFromArrOfObject(
-            await ProductRepo.get(type, categoryId, searchValue, priceListNameId,userTypeCat,employeeType)
+            await ProductRepo.get(type, categoryId, searchValue, priceListNameId, userTypeCat, employeeType)
         )
         console.log("productList", productList);
         if (productList.length != 0) {
@@ -162,7 +162,7 @@ export default class ProductsController {
         let priceListNameId = await UserTypesRepo.getUserType(typeOfUser)
 
         let productList = ProductDomain.createFromArrOfObject(
-            await ProductRepo.getProductDetail(userId,params.id, type, priceListNameId)
+            await ProductRepo.getProductDetail(userId, params.id, type, priceListNameId)
         )
 
         // let favorites: any = FavoritesDomain.createFromArrOfObject(await FavoritesRepo.getFavorites(userId))
@@ -225,9 +225,9 @@ export default class ProductsController {
 
         let childProductfilter
         if (childProduct.length != 0) {
-        	childProductfilter = await childProduct.filter(function (el) {
-        return el.normalPrice != 0
-           });
+            childProductfilter = await childProduct.filter(function (el) {
+                return el.normalPrice != 0
+            });
         }
 
         let productDetails = productList.length != 0 ? productList[0] : []
@@ -480,7 +480,7 @@ export default class ProductsController {
                                     const productListDetails = await ProductPriceListsRepo.create(insertData, language);
 
                                     // console.log(productListDetails,'productListDetails');
-                                    
+
                                 } else {
                                     let updatePrice = {
                                         price: price,

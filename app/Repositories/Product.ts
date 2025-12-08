@@ -13,13 +13,13 @@ export default class ProductRepo {
     }
 
     static async update(id: number, data: any, language: string) {
-        try {            
+        try {
             const product = await Product.findOrFail(id)
             product.merge(data)
             await product.save()
 
             return product
-        } catch (error) {            
+        } catch (error) {
             throw Exceptions.conflict(FAILURE.PRODUCT_CONFLICT[language])
         }
     }
@@ -56,7 +56,7 @@ export default class ProductRepo {
         return result
     }
 
-    static async get(type, categoryId, searchValue, priceListNameId, userType,employeeType) {
+    static async get(type, categoryId, searchValue, priceListNameId, userType, employeeType) {
         const result = await Product.query()
             .select('products.*')
             .select('categories.en_name as categoryName')
@@ -96,23 +96,23 @@ export default class ProductRepo {
 FROM carts AS o
 INNER JOIN products AS p ON o.product_id = p.id
 GROUP BY p.parent_id
-ORDER BY quantity DESC LIMIT 5`)                
+ORDER BY quantity DESC LIMIT 5`)
         return result[0]
     }
 
-    static async getProductDetail(userId,productId, type, priceListNameId) {
-        console.log("data"+productId+type+priceListNameId)
+    static async getProductDetail(userId, productId, type, priceListNameId) {
+        console.log("data" + productId + type + priceListNameId)
         const result = await Product.query()
             .select('products.*')
             .select('categories.en_name as categoryName')
             .select('product_price_lists.price as productPrice', 'product_price_lists.offer_price as offerPrice', 'product_price_lists.stock as stockCount')
             .select('favorites.id as favId')
             .leftJoin('favorites', (join) => {
-            join.on('products.id', '=', 'favorites.product_id')
-            if (userId) {
-                join.on('favorites.user_id', '=', userId)
-            }
-            }) 
+                join.on('products.id', '=', 'favorites.product_id')
+                if (userId) {
+                    join.on('favorites.user_id', '=', userId)
+                }
+            })
             .innerJoin('categories', 'products.category_id', 'categories.id')
             .innerJoin('product_price_lists', 'products.id', 'product_price_lists.product_id')
             .if(priceListNameId, (query) =>
@@ -133,12 +133,12 @@ ORDER BY quantity DESC LIMIT 5`)
             .select('products.*')
             .select('categories.en_name as categoryName')
             .select('product_price_lists.price as productPrice', 'product_price_lists.offer_price as offerPrice', 'product_price_lists.stock as stockCount')
-            .select('favorites.id as favId')
+            // Use scalar subquery to avoid row multiplication from favorites join
+            .select(Database.raw('(SELECT MAX(f.id) FROM favorites f WHERE f.product_id = products.id) AS favId'))
             .where('products.active', 1)
-            .leftJoin('favorites', 'products.id', 'favorites.product_id')
+            // Removed: .leftJoin('favorites', 'products.id', 'favorites.product_id')
             .innerJoin('categories', 'products.category_id', 'categories.id')
             .innerJoin('product_price_lists', 'products.id', 'product_price_lists.product_id')
-            // .where('product_price_lists.price_list_name_id', priceListNameId)
             .if(priceListNameId, (query) =>
                 query.where('product_price_lists.price_list_name_id', priceListNameId))
             .where((query) => {
@@ -209,7 +209,7 @@ ORDER BY quantity DESC LIMIT 5`)
         return result
     }
 
-    static async adminGet(type, active, offset, limit, orderBy, orderByValue, postRange, searchValue, isBasket, parentId) {        
+    static async adminGet(type, active, offset, limit, orderBy, orderByValue, postRange, searchValue, isBasket, parentId) {
         const currentData = format(new Date(), 'yyyy-MM-dd')
         const result = await Product.query()
             .select('products.*')
@@ -252,7 +252,7 @@ ORDER BY quantity DESC LIMIT 5`)
         return result
     }
 
-    static async getAppliedCouponId(userId) {        
+    static async getAppliedCouponId(userId) {
         const result = await Order.query()
             .select('coupon_id')
             // .whereNot('couponId', 'NULL')
@@ -269,7 +269,7 @@ ORDER BY quantity DESC LIMIT 5`)
         return result
     }
 
-    static async getProductForPastOrder(orderId: any,id: any, language: string, priceListNameId: number) {
+    static async getProductForPastOrder(orderId: any, id: any, language: string, priceListNameId: number) {
         // const result = await Product.query().whereIn('id', JSON.parse((id)))
         // const result = await Product.query().whereIn('id', id)
         const result = await Product.query()
