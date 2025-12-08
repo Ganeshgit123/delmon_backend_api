@@ -40,8 +40,8 @@ const databaseConfig: DatabaseConfig = {
         port: Env.get('MYSQL_PORT'),
         user: Env.get('MYSQL_USER'),
         // password: 'k8t$H9rB7P9(**#3',
-      password: 'k8t$H9rB7P9(**#3',
-      charset: 'utf8mb4', // <= important
+        password: Env.get('MYSQL_PASSWORD'),
+        charset: 'utf8mb4', // <= important
 
         database: Env.get('MYSQL_DB_NAME'),
       },

@@ -252,18 +252,16 @@ export default class OrdersController {
         let userList = UserDomain.createFromArrOfObject(
             await UserRepo.getUserById([userId])
         )
-        console.log(userList[0], 'llll');
-        console.log(userList[0].cartonDiscount, 'userList');
-        console.log(payload.cartonDiscount, 'ddd');
+        // console.log(userList[0], 'llll');
+        // console.log(userList[0].cartonDiscount, 'userList');
+        // console.log(payload.cartonDiscount, 'ddd');
         if (payload.cartonDiscount) {
             payload.cartonDiscount = userList[0].cartonDiscount - payload.cartonDiscount
         }
         if (userList[0].userType == 'USER') {
             await delete payload.employeeCartonDiscount
-
         } else {
             await delete payload.userCartonDiscount
-
         }
 
         let cartDetails = await OrderRepo.create(payload, language);
@@ -303,7 +301,21 @@ export default class OrdersController {
         let LoyaltyAmount = payload.LoyaltyAmount ? payload.LoyaltyAmount : 0
         await CartRepo.cartUpdate(cartDetails.$attributes.id, cartIds);
 
-        if (payload.isLoyaltyPointApply == true) {
+        let setting = SettingsDomain.createFromArrOfObject(
+            await SettingsRepo.adminGet(1)
+        )
+
+        let enLoyaltyPointDiscount
+        if (setting.length != 0) {
+            await setting.map((data) => {
+                if (data.key == 'loyalty_point_per_order') {
+                    enLoyaltyPointDiscount = data.enValue
+                }
+            })
+        }
+        let loyaltyPointDiscount = enLoyaltyPointDiscount
+
+        if (payload.isLoyaltyPointApply == true && loyaltyPointDiscount != 0) {
             let LoyaltyAmountSub = userList[0].loyaltyPoint - LoyaltyAmount
             let LoyaltyAmountAdd = LoyaltyAmountSub + loyaltyPoint
             await UserRepo.loyaltyPointUpdate(userId, LoyaltyAmountAdd, language);
@@ -422,7 +434,7 @@ export default class OrdersController {
         let loyaltyPointDiscount = enLoyaltyPointDiscount
 
         if (UpdatePost.orderStatus == 'USERREJECTED' || UpdatePost.orderStatus == 'CANCELLED') {
-            if (orderDetail.isLoyaltyPointApply == true) {
+            if (orderDetail.isLoyaltyPointApply == true && loyaltyPointDiscount != 0) {
                 let loyaltyPoint = (orderDetail.netAmount / 100) * 10
 
                 let LoyaltyPointsPayload = {
@@ -467,7 +479,7 @@ export default class OrdersController {
 
         if (UpdatePost.orderStatus == 'COMPLETED') {
             // Only calculate and persist loyalty points when discount is enabled (non-zero)
-            if (loyaltyPointDiscount != 0) {
+            if (orderDetail.isLoyaltyPointApply == true && loyaltyPointDiscount != 0) {
                 const loyaltyPoint = (orderDetail.netAmount / 100) * loyaltyPointDiscount
                 const LoyaltyPointsPayload = {
                     userId: orderDetail.userId,

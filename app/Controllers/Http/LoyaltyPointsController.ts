@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Validators from "../../Validators";
-import { LoyaltyPointsDomain, UserDomain } from "../../Domain";
-import { LoyaltyPointsRepo, UserRepo } from "../../Repositories";
+import { LoyaltyPointsDomain, UserDomain, SettingsDomain } from "../../Domain";
+import { LoyaltyPointsRepo, UserRepo, SettingsRepo } from "../../Repositories";
 import { SUCCESS } from "../../Data/language";
 import AuthController from 'App/Controllers/Http/AuthController'
 
@@ -48,31 +48,47 @@ export default class LoyaltyPointsController {
         let payload = request.all()
         const language = request.header('language') || 'en'
         // let totalLoyaltyPoint = payload.totalLoyaltyPoint
+        let setting = SettingsDomain.createFromArrOfObject(
+            await SettingsRepo.adminGet(1)
+        )
+        let enLoyaltyPointDiscount
+
+        if (setting.length != 0) {
+            await setting.map((data) => {
+                if (data.key == 'loyalty_point_per_order') {
+                    enLoyaltyPointDiscount = data.enValue
+                }
+            })
+        }
+        let loyaltyPointDiscount = enLoyaltyPointDiscount
+
         let totalAmount = payload.totalAmount
         let loyaltyPoint = Math.round((totalAmount / 100) * 10)
-        // if (totalLoyaltyPoint >= loyaltyPoint) {
-        let massage
-        if (loyaltyPoint == 0) {
-            massage = language == 'en' ? `max order value is 100 to apply loyalty Points` : 'الحد الأقصى لقيمة الطلب هو 100 نقطة لتطبيق نقاط الولاء'
+
+        if (loyaltyPointDiscount != 0) {
+            // if (totalLoyaltyPoint >= loyaltyPoint) {
+            let massage
+            if (loyaltyPoint == 0) {
+                massage = language == 'en' ? `max order value is 100 to apply loyalty Points` : 'الحد الأقصى لقيمة الطلب هو 100 نقطة لتطبيق نقاط الولاء'
+                return {
+                    error: false,
+                    massage: massage,
+                    data: loyaltyPoint,
+                };
+            } else {
+                massage = language == 'en' ? `You have save ${loyaltyPoint} in this order.` : `لقد قمت بحفظ ${loyaltyPoint} بهذا الترتيب.`
+                return {
+                    error: false,
+                    massage: massage,
+                    data: loyaltyPoint,
+                };
+            }
+        }
+        else {
             return {
-                error: false,
-                massage: massage,
-                data: loyaltyPoint,
-            };
-        } else {
-            massage = language == 'en' ? `You have save ${loyaltyPoint} in this order.` : `لقد قمت بحفظ ${loyaltyPoint} بهذا الترتيب.`
-            return {
-                error: false,
-                massage: massage,
-                data: loyaltyPoint,
+                error: true,
+                massage: `You have No loyaltyPoint.`,
             };
         }
-        // } else {
-        // return {
-        //     error: true,
-        //     massage: `You have low loyaltyPoint.`,
-        //     data: loyaltyPoint || 0,
-        // };
-        // }
     }
 }
