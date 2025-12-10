@@ -541,11 +541,15 @@ export default class OrdersController {
 
             const emailBody = getOrderConfirmationEmailBody(customerName, orderNumber);
 
-            await sendEmail(
-                userData[0].email,
-                `Order Confirmation - Delmon Order-${orderNumber}`,
-                emailBody
-            );
+            try {
+                await sendEmail(
+                    userData[0].email,
+                    `Order Confirmation - Delmon Order-${orderNumber}`,
+                    emailBody
+                );
+            } catch (err) {
+                console.log('Email send failed (approval):', err);
+            }
         }
 
         // Email Notification for order cancellation
@@ -555,11 +559,15 @@ export default class OrdersController {
 
             const emailBody = getOrderCancelledEmailBody(customerName, orderNumber);
 
-            await sendEmail(
-                userData[0].email,
-                `Order Cancelled - Delmon Order-${orderNumber}`,
-                emailBody
-            );
+            try {
+                await sendEmail(
+                    userData[0].email,
+                    `Order Cancelled - Delmon Order-${orderNumber}`,
+                    emailBody
+                );
+            } catch (err) {
+                console.log('Email send failed (cancellation):', err);
+            }
         }
 
         // Email Notification for order delivery
@@ -569,11 +577,15 @@ export default class OrdersController {
 
             const emailBody = getOrderDeliveredEmailBody(customerName, orderNumber);
 
-            await sendEmail(
-                userData[0].email,
-                `Order Delivered - Delmon Order-${orderNumber}`,
-                emailBody
-            );
+            try {
+                await sendEmail(
+                    userData[0].email,
+                    `Order Delivered - Delmon Order-${orderNumber}`,
+                    emailBody
+                );
+            } catch (err) {
+                console.log('Email send failed (delivery):', err);
+            }
         }
 
         const data = userData
@@ -718,13 +730,16 @@ export default class OrdersController {
                     const customerName = userData[0].userName
                     const emailBody = getOrderConfirmationEmailBody(customerName, orderNumber)
 
-                    await sendEmail(
-                        userData[0].email,
-                        `Order Confirmation - Delmon Order-${orderNumber}`,
-                        emailBody
-                    )
+                    try {
+                        await sendEmail(
+                            userData[0].email,
+                            `Order Confirmation - Delmon Order-${orderNumber}`,
+                            emailBody
+                        )
+                    } catch (err) {
+                        console.log('Email send failed (multi approval):', singleId, err)
+                    }
                 } catch (err) {
-                    // log and continue with next id (don't throw to avoid aborting the entire batch)
                     console.log('multiUpdate: email/send error for id', singleId, err)
                 }
             }
