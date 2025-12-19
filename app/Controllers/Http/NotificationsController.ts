@@ -143,7 +143,7 @@ export default class NotificationsController {
                     const notificationData = {
                         productId: 0,
                         userId: user.id,
-                        type: 'ADMIN',
+                        type: 'ADMIN_PUSH',
                         message: payload.message
                     }
 
@@ -277,7 +277,7 @@ export default class NotificationsController {
                         await NotificationRepo.create({
                             productId: 0,
                             userId: user.id,
-                            type: 'ADMIN',
+                            type: 'ADMIN_SMS',
                             message: messageText
                         }, language)
 

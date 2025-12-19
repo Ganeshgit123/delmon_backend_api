@@ -14,10 +14,11 @@ export default class DashboardController {
         // const adminCount = await DashboardRepo.getAdminCount()
         const areaCount = await DashboardRepo.getAreaCount()
 
-        
+
         const getDailySalesCount: any = await DashboardRepo.getDailySalesCount()
         const getWeekSalesCount: any = await DashboardRepo.getWeekSalesCount()
         const getYearSalesCount: any = await DashboardRepo.getYearSalesCount()
+        const getMonthSalesCount: any = await DashboardRepo.getMonthSalesCount()
 
         return {
             success: true,
@@ -28,15 +29,12 @@ export default class DashboardController {
                 feedingCount: feedingCount[0],
                 ordersCount: ordersCount[0],
                 feedingOrdersCount: feedingOrdersCount[0],
-                // brandCount: brandCount[0]
                 areaCount: areaCount[0],
-                // dailySalesCount: getDailySalesCount[0] == 'null' ? 0 : getDailySalesCount[0],
-                // weekSalesCount: getWeekSalesCount[0] == 'null' ? 0 : getWeekSalesCount[0],
-                // yearSalesCount: getYearSalesCount[0] == 'null' ? 0 : getYearSalesCount[0],
 
                 dailySalesCount: { "dailySalesCount": getDailySalesCount[0].dailySalesCount == null ? 0 : getDailySalesCount[0].dailySalesCount },
                 weekSalesCount: { "weekSalesCount": getWeekSalesCount[0].weekSalesCount == null ? 0 : getWeekSalesCount[0].weekSalesCount },
-                yearSalesCount: { "yearSalesCount": getYearSalesCount[0].yearSalesCount == null ? 0 : getYearSalesCount[0].yearSalesCount }
+                yearSalesCount: { "yearSalesCount": getYearSalesCount[0].yearSalesCount == null ? 0 : getYearSalesCount[0].yearSalesCount },
+                monthSalesCount: { "monthSalesCount": getMonthSalesCount[0].monthSalesCount == null ? 0 : getMonthSalesCount[0].monthSalesCount }
             }]
         };
     }

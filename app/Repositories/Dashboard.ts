@@ -1,7 +1,7 @@
 // import Exceptions from '../Exceptions'
 // import Post from 'App/Models/Post'
 import Database from '@ioc:Adonis/Lucid/Database'
-import { format, subYears, subMonths } from 'date-fns'
+import { format, subYears, subMonths, startOfMonth, subDays } from 'date-fns'
 
 export default class DashboardRepo {
 
@@ -78,10 +78,8 @@ export default class DashboardRepo {
 
     static async getWeekSalesCount() {
         var datetime: any = new Date();
-        var startDate: any = format(datetime, 'yyyy-MM-dd')
-
-        var endDate: any = subMonths(datetime, 1);
-        endDate = format(endDate, 'yyyy-MM-dd')
+        var startDate: any = format(datetime, 'yyyy-MM-dd') // today
+        var endDate: any = format(subDays(datetime, 6), 'yyyy-MM-dd') // last 7 days inclusive
 
         const result = await Database.rawQuery(`SELECT  SUM(net_amount) as weekSalesCount from orders where
         (created_at BETWEEN '${endDate} 00:00:00' AND '${startDate} 23:59:00')`)
@@ -97,6 +95,16 @@ export default class DashboardRepo {
 
         const result = await Database.rawQuery(`SELECT SUM(net_amount) as yearSalesCount from orders where
         (created_at BETWEEN '${endDate} 00:00:00' AND '${startDate} 23:59:00')`)
+        return result[0]
+    }
+
+    static async getMonthSalesCount() {
+        var datetime: any = new Date();
+        var startDate: any = format(startOfMonth(datetime), 'yyyy-MM-dd')
+        var endDate: any = format(datetime, 'yyyy-MM-dd')
+
+        const result = await Database.rawQuery(`SELECT SUM(net_amount) as monthSalesCount from orders where
+        (created_at BETWEEN '${startDate} 00:00:00' AND '${endDate} 23:59:00')`)
         return result[0]
     }
 
